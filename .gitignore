@@ -1,0 +1,16 @@
+# 시스템 파일
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 환경 설정 (비밀키 등)
+.env
+.env.local
+*.key
+*.pem
+
+# 임시 파일
+*.tmp
+*.log
+__pycache__/
+node_modules/
