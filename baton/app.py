@@ -27,24 +27,28 @@ simulation = SimulationManager(slack_client=app.client, claude=claude, knowledge
 
 
 @app.event("message")
-def handle_dm(event, say, logger):
-    """DM으로 오는 질문에 전임자 스타일로 답변"""
-    if event.get("channel_type") != "im":
-        return
+def handle_message(event, say, logger):
     if event.get("bot_id"):
         return
-
-    question = event.get("text", "").strip()
-    if not question:
+    text = event.get("text", "").strip()
+    if not text:
         return
 
-    knowledge = store.read_all()
-    if not knowledge:
-        say("아직 학습된 내용이 없어요. `/바톤-학습` 명령어로 먼저 학습을 시작해주세요.")
+    thread_ts = event.get("thread_ts")
+
+    # 시뮬레이션 스레드 답변 감지
+    if thread_ts and simulation.get_thread_info(thread_ts):
+        simulation.handle_thread_reply(thread_ts, text)
         return
 
-    answer = claude.answer_question(question, knowledge, PREDECESSOR_NAME)
-    say(answer)
+    # DM 질문 답변
+    if event.get("channel_type") == "im":
+        knowledge = store.read_all()
+        if not knowledge:
+            say("아직 학습된 내용이 없어요. `/baton-simulation` 으로 시뮬레이션을 시작해보세요.")
+            return
+        answer = claude.answer_question(text, knowledge, PREDECESSOR_NAME)
+        say(answer)
 
 
 @app.command("/바톤-학습")
@@ -83,21 +87,21 @@ def confirm_handover(ack, say, command):
     say(f"✅ <@{successor_id}>님께 온보딩 내용을 전달했습니다!")
 
 
-@app.command("/바톤-시뮬레이션")
-def run_simulation(ack, say, command):
-    """실전 시뮬레이션 시작. 사용법: /바톤-시뮬레이션 5"""
+@app.command("/baton-simulation")
+def run_simulation(ack, respond, command):
+    """실전 시뮬레이션 시작. 사용법: /baton-simulation 5"""
     ack()
-    text = command.get("text", "5").strip()
-    count = int(text) if text.isdigit() else 5
+    text = command.get("text", "20").strip()
+    count = int(text) if text.isdigit() else 20
     count = min(count, len(PERSONAS))
     user_id = command["user_id"]
-    say(f"🎭 {count}명 페르소나 시뮬레이션을 시작합니다!")
-    simulation.run_simulation(target_user_id=user_id, persona_count=count)
+    channel_id = command["channel_id"]
+    simulation.run_simulation(target_user_id=user_id, persona_count=count, channel_id=channel_id)
 
 
 if __name__ == "__main__":
     scheduler = LearningScheduler(learner)
     scheduler.start()
-    print("📅 매주 월요일 오전 6시 자동 학습 스케줄러 시작")
+    print("바톤 봇 시작 - 매주 월요일 오전 6시 자동 학습 스케줄러 실행 중")
     handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
     handler.start()
