@@ -23,7 +23,7 @@ learner = SlackLearner(
     store=store
 )
 onboarding = OnboardingManager(slack_client=app.client, claude=claude, store=store)
-simulation = SimulationManager(slack_client=app.client, claude=claude)
+simulation = SimulationManager(slack_client=app.client, claude=claude, knowledge=store.read_all())
 
 
 @app.event("message")

@@ -17,11 +17,18 @@ class KnowledgeStore:
 
     def read_all(self) -> str:
         parts = []
+        # 기존 마크다운 카테고리 파일
         for cat in ["업무_프로세스", "자주_묻는_질문", "담당자_스타일"]:
             path = self.files[cat]
             text = path.read_text(encoding="utf-8").strip()
             if text and text != f"# {cat}":
                 parts.append(text)
+        # 슬랙 채널 추출 txt 파일 + 인수인계서 md 파일
+        for ext in ("*.txt", "인수인계서*.md"):
+            for path in sorted(self.base_dir.glob(ext)):
+                text = path.read_text(encoding="utf-8").strip()
+                if text:
+                    parts.append(f"## [{path.stem}]\n{text}")
         return "\n\n".join(parts)
 
     def append(self, category: str, content: str) -> None:
