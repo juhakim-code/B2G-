@@ -8,6 +8,7 @@ from baton.claude_client import ClaudeClient
 from baton.learner import SlackLearner
 from baton.scheduler import LearningScheduler
 from baton.onboarding import OnboardingManager
+from baton.personas import SimulationManager, PERSONAS
 
 load_dotenv()
 
@@ -22,6 +23,7 @@ learner = SlackLearner(
     store=store
 )
 onboarding = OnboardingManager(slack_client=app.client, claude=claude, store=store)
+simulation = SimulationManager(slack_client=app.client, claude=claude)
 
 
 @app.event("message")
@@ -79,6 +81,18 @@ def confirm_handover(ack, say, command):
 
     onboarding.confirm_and_deliver(predecessor_id, successor_id, selected_ids, PREDECESSOR_NAME)
     say(f"✅ <@{successor_id}>님께 온보딩 내용을 전달했습니다!")
+
+
+@app.command("/바톤-시뮬레이션")
+def run_simulation(ack, say, command):
+    """실전 시뮬레이션 시작. 사용법: /바톤-시뮬레이션 5"""
+    ack()
+    text = command.get("text", "5").strip()
+    count = int(text) if text.isdigit() else 5
+    count = min(count, len(PERSONAS))
+    user_id = command["user_id"]
+    say(f"🎭 {count}명 페르소나 시뮬레이션을 시작합니다!")
+    simulation.run_simulation(target_user_id=user_id, persona_count=count)
 
 
 if __name__ == "__main__":
