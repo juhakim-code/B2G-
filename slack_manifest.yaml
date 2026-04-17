@@ -1,0 +1,49 @@
+display_information:
+  name: 바톤
+  description: AI 업무 인수인계 챗봇
+  background_color: "#4A154B"
+
+features:
+  bot_user:
+    display_name: 바톤
+    always_online: true
+  slash_commands:
+    - command: /바톤-학습
+      description: 슬랙 채널 전체 기록을 학습합니다
+      usage_hint: ""
+      should_escape: false
+    - command: /바톤-인계
+      description: 인계 프로세스를 시작합니다
+      usage_hint: ""
+      should_escape: false
+    - command: /바톤-인계-확정
+      description: 인수자에게 온보딩 내용을 전달합니다
+      usage_hint: "@인수자 1,2,3"
+      should_escape: false
+    - command: /바톤-시뮬레이션
+      description: 실전 시뮬레이션을 시작합니다
+      usage_hint: "5"
+      should_escape: false
+
+oauth_config:
+  scopes:
+    bot:
+      - channels:history
+      - channels:read
+      - chat:write
+      - commands
+      - im:history
+      - im:read
+      - im:write
+      - users:read
+
+settings:
+  event_subscriptions:
+    bot_events:
+      - message.im
+      - message.channels
+  interactivity:
+    is_enabled: false
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false
