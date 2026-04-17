@@ -14,3 +14,9 @@ desktop.ini
 *.log
 __pycache__/
 node_modules/
+
+# Git 워크트리
+.worktrees/
+
+# 비주얼 컴패니언
+.superpowers/
