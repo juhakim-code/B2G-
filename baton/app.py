@@ -5,6 +5,8 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 from baton.knowledge_store import KnowledgeStore
 from baton.claude_client import ClaudeClient
+from baton.learner import SlackLearner
+from baton.scheduler import LearningScheduler
 
 load_dotenv()
 
@@ -12,6 +14,12 @@ app = App(token=os.environ["SLACK_BOT_TOKEN"])
 store = KnowledgeStore()
 claude = ClaudeClient(api_key=os.environ["ANTHROPIC_API_KEY"])
 PREDECESSOR_NAME = os.environ.get("PREDECESSOR_NAME", "전임자")
+
+learner = SlackLearner(
+    slack_token=os.environ["SLACK_BOT_TOKEN"],
+    claude=claude,
+    store=store
+)
 
 
 @app.event("message")
@@ -40,7 +48,8 @@ def trigger_learning(ack, say, logger):
     """수동으로 전체 채널 학습 트리거"""
     ack()
     say("📚 슬랙 채널 학습을 시작합니다...")
-    say("✅ 학습 완료! DM으로 질문해보세요.")
+    count = learner.learn_all_channels()
+    say(f"✅ {count}개 채널 학습 완료! DM으로 질문해보세요.")
 
 
 @app.command("/바톤-인계")
@@ -51,5 +60,8 @@ def start_handover(ack, say):
 
 
 if __name__ == "__main__":
+    scheduler = LearningScheduler(learner)
+    scheduler.start()
+    print("📅 매주 월요일 오전 6시 자동 학습 스케줄러 시작")
     handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
     handler.start()
