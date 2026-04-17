@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>바톤 — 발표자료</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Malgun Gothic', sans-serif; background: #0d0d1a; color: #fff; overflow: hidden; }
+
+  :root {
+    --red: #e94560;
+    --navy: #1a1a2e;
+    --navy2: #16213e;
+    --navy3: #0f3460;
+    --white: #f0f0f0;
+    --gray: #a0a0b0;
+  }
+
+  .deck { width: 100%; }
+  .slide {
+    display: none;
+    width: 100vw; height: 100vh;
+    padding: 56px 72px;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .slide.active { display: flex; }
+
+  /* 태그 */
+  .tag {
+    display: inline-block;
+    background: var(--red);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  /* 슬라이드 헤더 */
+  .slide-header h1 {
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+  .slide-header .sub {
+    color: var(--gray);
+    font-size: 16px;
+    margin-bottom: 32px;
+  }
+
+  /* ───────────────────────────────────────
+     S1 · 표지
+  ─────────────────────────────────────── */
+  #s1 {
+    background: var(--navy);
+    align-items: flex-start;
+    justify-content: center;
+  }
+  #s1::before {
+    content: '';
+    position: absolute;
+    right: -80px; top: -80px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(233,69,96,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  #s1 .eyebrow {
+    font-size: 13px;
+    color: var(--red);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  #s1 .logo {
+    font-size: 88px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+  #s1 .logo em { color: var(--red); font-style: normal; }
+  #s1 .tagline {
+    font-size: 22px;
+    color: var(--gray);
+    margin-bottom: 48px;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+  #s1 .tagline b { color: #fff; }
+  #s1 .team {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  #s1 .member {
+    background: var(--navy2);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: var(--gray);
+  }
+
+  /* ───────────────────────────────────────
+     S2 · 문제정의
+  ─────────────────────────────────────── */
+  #s2 { background: var(--navy2); }
+  .quote-block {
+    background: var(--navy);
+    border-left: 4px solid var(--red);
+    border-radius: 0 12px 12px 0;
+    padding: 24px 32px;
+    margin-bottom: 28px;
+    font-size: 18px;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+  .quote-block b { color: #fff; }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 8px;
+  }
+  .stat-card {
+    background: var(--navy);
+    border-radius: 14px;
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .stat-card .num {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--red);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-card .label {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  /* ───────────────────────────────────────
+     S3 · 솔루션
+  ─────────────────────────────────────── */
+  #s3 { background: var(--navy); }
+  .solution-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 8px;
+    align-items: center;
+  }
+  .before-after {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .ba-card {
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .ba-card.before {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid #333;
+  }
+  .ba-card.after {
+    background: rgba(233,69,96,0.1);
+    border: 1px solid var(--red);
+  }
+  .ba-card .ba-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    color: var(--gray);
+  }
+  .ba-card.after .ba-label { color: var(--red); }
+  .ba-card ul { list-style: none; }
+  .ba-card ul li {
+    font-size: 14px;
+    color: var(--gray);
+    padding: 5px 0;
+  }
+  .ba-card ul li::before { content: "✗ "; color: #555; }
+  .ba-card.after ul li { color: #fff; }
+  .ba-card.after ul li::before { content: "✓ "; color: var(--red); }
+  .how-box {
+    background: var(--navy2);
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .how-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .how-num {
+    width: 40px; height: 40px;
+    background: var(--red);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 18px;
+    flex-shrink: 0;
+  }
+  .how-step h4 { font-size: 16px; margin-bottom: 4px; }
+  .how-step p { font-size: 13px; color: var(--gray); line-height: 1.5; }
+  .how-cmd {
+    display: inline-block;
+    background: var(--navy3);
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    margin-top: 4px;
+  }
+
+  /* ───────────────────────────────────────
+     S4 · 데모
+  ─────────────────────────────────────── */
+  #s4 { background: var(--navy2); }
+  .demo-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 28px;
+    margin-top: 8px;
+    align-items: start;
+  }
+  .slack-window {
+    background: #1d1c1f;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .slack-titlebar {
+    background: #2c0e30;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .slack-titlebar .dots { display: flex; gap: 6px; }
+  .slack-titlebar .dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #555;
+  }
+  .slack-titlebar .channel { font-size: 13px; color: #aaa; margin-left: 4px; }
+  .slack-messages { padding: 20px; }
+  .msg { display: flex; gap: 12px; margin-bottom: 18px; }
+  .avatar {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+  }
+  .av-u { background: #2c5282; }
+  .av-b { background: #7b2d2d; }
+  .msg-name { font-size: 12px; color: #ccc; margin-bottom: 4px; font-weight: 700; }
+  .msg-name .time { color: #666; font-weight: 400; margin-left: 6px; font-size: 11px; }
+  .msg-text { color: #e2e8f0; font-size: 14px; line-height: 1.6; }
+  .msg-text .prefix {
+    display: block;
+    color: var(--red);
+    font-size: 12px;
+    margin-bottom: 4px;
+    font-style: italic;
+  }
+  .demo-points {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .demo-point {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 18px 20px;
+    border-left: 3px solid var(--red);
+  }
+  .demo-point .dp-cmd {
+    font-family: monospace;
+    color: var(--red);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .demo-point .dp-desc { color: var(--gray); font-size: 13px; line-height: 1.5; }
+
+  /* ───────────────────────────────────────
+     S5 · 시나리오
+  ─────────────────────────────────────── */
+  #s5 { background: var(--navy); }
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 8px;
+  }
+  .sc-card {
+    background: var(--navy2);
+    border-radius: 14px;
+    padding: 26px;
+    position: relative;
+    overflow: hidden;
+  }
+  .sc-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, rgba(233,69,96,0.12) 0%, transparent 70%);
+  }
+  .sc-who {
+    font-size: 11px;
+    color: var(--red);
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .sc-card h3 { font-size: 17px; margin-bottom: 14px; }
+  .sc-flow {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 2;
+  }
+  .sc-flow strong { color: #fff; }
+  .sc-result {
+    margin-top: 14px;
+    background: rgba(233,69,96,0.1);
+    border: 1px solid rgba(233,69,96,0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--red);
+  }
+
+  /* ───────────────────────────────────────
+     S6 · 확장
+  ─────────────────────────────────────── */
+  #s6 { background: var(--navy2); }
+  .expand-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-top: 8px;
+  }
+  .exp-card {
+    background: var(--navy);
+    border-radius: 14px;
+    padding: 28px 24px;
+    position: relative;
+  }
+  .exp-card .step-badge {
+    display: inline-block;
+    background: var(--red);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+  .exp-card h3 { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+  .exp-card .exp-sub { color: var(--red); font-size: 13px; margin-bottom: 12px; }
+  .exp-card ul { list-style: none; }
+  .exp-card ul li {
+    font-size: 13px;
+    color: var(--gray);
+    padding: 4px 0;
+  }
+  .exp-card ul li::before { content: "· "; color: var(--red); }
+  .expand-bottom {
+    margin-top: 20px;
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-left: 4px solid var(--red);
+  }
+  .expand-bottom .icon { font-size: 24px; }
+  .expand-bottom p { font-size: 14px; color: var(--gray); line-height: 1.6; }
+  .expand-bottom p b { color: #fff; }
+
+  /* ───────────────────────────────────────
+     S7 · 마무리
+  ─────────────────────────────────────── */
+  #s7 {
+    background: var(--navy);
+    align-items: center;
+    text-align: center;
+  }
+  #s7::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(233,69,96,0.1) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  #s7 .closing {
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1.3;
+    max-width: 720px;
+  }
+  #s7 .closing em { color: var(--red); font-style: normal; }
+  #s7 .closing-sub {
+    font-size: 18px;
+    color: var(--gray);
+    margin: 20px 0 48px;
+    max-width: 500px;
+  }
+  #s7 .team-row { display: flex; gap: 14px; justify-content: center; }
+  #s7 .member {
+    background: var(--navy2);
+    border: 1px solid #2a2a3e;
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-size: 15px;
+    color: var(--gray);
+  }
+
+  /* ───────────────────────────────────────
+     네비게이션
+  ─────────────────────────────────────── */
+  .nav {
+    position: fixed;
+    bottom: 28px; right: 36px;
+    display: flex; gap: 10px; align-items: center;
+    z-index: 100;
+  }
+  .nav button {
+    background: rgba(22,33,62,0.9);
+    border: 1px solid var(--red);
+    color: var(--white);
+    padding: 9px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'Malgun Gothic', sans-serif;
+    backdrop-filter: blur(8px);
+    transition: background 0.2s;
+  }
+  .nav button:hover { background: var(--red); }
+  .nav .counter {
+    color: var(--gray);
+    font-size: 13px;
+    min-width: 52px;
+    text-align: center;
+  }
+  .slide-num {
+    position: fixed;
+    top: 22px; right: 36px;
+    background: rgba(22,33,62,0.85);
+    border: 1px solid #2a2a3e;
+    border-radius: 8px;
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--gray);
+    backdrop-filter: blur(8px);
+  }
+  .slide-num b { color: var(--red); }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- ─── S1 · 표지 ─── -->
+  <div class="slide active" id="s1">
+    <div class="eyebrow">AX 해커톤 2026</div>
+    <div class="logo">BA<em>TON</em></div>
+    <div class="tagline">
+      <b>사람은 떠나도, 노하우는 남는다</b><br>
+      <span style="font-size:17px;">신입직원의 빠른 적응, 재직자의 끊김 없는 업무 이관<br>슬랙 기반 AI 인수인계 챗봇</span>
+    </div>
+    <div style="font-size:13px;color:var(--red);font-weight:700;letter-spacing:2px;margin-bottom:12px;">TEAM B2GENIUS</div>
+    <div class="team">
+      <div class="member">김신성</div>
+      <div class="member">장재은</div>
+      <div class="member">김주하</div>
+    </div>
+  </div>
+
+  <!-- ─── S2 · 문제정의 ─── -->
+  <div class="slide" id="s2">
+    <div class="slide-header">
+      <div class="tag">01 &nbsp; 문제정의</div>
+      <h1>인수인계 문서는 있지만,<br><span style="color:var(--red)">판단 기준은 사라진다</span></h1>
+    </div>
+    <div class="quote-block">
+      "전임자가 퇴직한 뒤 <b>카카오톡이 3개월 넘게</b> 왔어요.<br>
+      문서에 없는 건 결국 사람한테 물어볼 수밖에 없거든요."
+    </div>
+    <div class="stat-row" style="grid-template-columns: 1fr 1fr;">
+      <div class="stat-card">
+        <div class="num">400명</div>
+        <div class="label">우리 회사 전체 임직원<br><span style="font-size:11px;color:#555">인수인계 대상 전원</span></div>
+      </div>
+      <div class="stat-card" style="border: 2px solid var(--red);">
+        <div class="num" style="font-size:40px;">3억원</div>
+        <div class="label">
+          <span style="color:#fff;font-weight:700;">인수인계 손실 비용 (연간)</span><br>
+          <span style="font-size:12px;color:#666;margin-top:6px;display:block;">400명 × 80만원 (인계 소요 임금)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── S3 · 솔루션 ─── -->
+  <div class="slide" id="s3">
+    <div class="slide-header">
+      <div class="tag">02 &nbsp; 솔루션</div>
+      <h1>AI가 전임자의 방식을<br>슬랙 안에서 재현합니다</h1>
+    </div>
+    <div class="solution-wrap">
+      <div class="before-after">
+        <div class="ba-card before">
+          <div class="ba-label">BEFORE · 지금까지</div>
+          <ul>
+            <li>인수인계 문서 1회 작성 후 방치</li>
+            <li>신입이 선배 눈치 보며 반복 질문</li>
+            <li>전임자 퇴직 = 노하우 함께 증발</li>
+            <li>담당자 바뀔 때마다 처음부터 재학습</li>
+          </ul>
+        </div>
+        <div class="ba-card after">
+          <div class="ba-label">AFTER · 바톤 도입 후</div>
+          <ul>
+            <li>슬랙 대화 자동 학습 → 지식 DB 누적</li>
+            <li>신입이 언제든 DM으로 즉시 질문</li>
+            <li>전임자 스타일로 답변 · 판단 기준 보존</li>
+            <li>실전 시뮬레이션으로 현장 감각 사전 훈련</li>
+          </ul>
+        </div>
+      </div>
+      <div class="how-box">
+        <div class="how-step">
+          <div class="how-num">1</div>
+          <div>
+            <h4>학습</h4>
+            <p>슬랙 채널 90일 대화를 AI가 분석<br>업무 프로세스·판단 기준 자동 추출</p>
+            <span class="how-cmd">/바톤-학습</span>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="how-num">2</div>
+          <div>
+            <h4>온보딩 주도</h4>
+            <p>바톤이 먼저 인수자에게 단계별 업무 내용 DM 발송<br>질문이 오면 전임자 스타일로 즉시 답변<br>신입·재직자 모두 바톤이 온보딩을 이끈다</p>
+            <span class="how-cmd">바톤 → 인수자 DM 자동 발송</span>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="how-num">3</div>
+          <div>
+            <h4>시뮬레이션</h4>
+            <p>AI 페르소나 20명이 실제처럼 DM 발송<br>강성 민원까지 포함한 실전 훈련</p>
+            <span class="how-cmd">/바톤-시뮬레이션</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── S4 · 데모 ─── -->
+  <div class="slide" id="s4">
+    <div class="slide-header">
+      <div class="tag">03 &nbsp; 라이브 데모</div>
+      <h1>슬랙에서 바로 작동합니다</h1>
+    </div>
+    <div class="demo-grid">
+      <div class="slack-window">
+        <div class="slack-titlebar">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <div class="channel">💬 DM &nbsp;·&nbsp; 바톤봇</div>
+        </div>
+        <div class="slack-messages">
+          <div class="msg">
+            <div class="avatar av-u">👤</div>
+            <div>
+              <div class="msg-name">장재은 <span class="time">오전 9:02</span></div>
+              <div class="msg-text">훈련장려금 신청 기한이 지났을 때 어떻게 처리해요?</div>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="avatar av-b">🤖</div>
+            <div>
+              <div class="msg-name">바톤봇 <span class="time">오전 9:02</span></div>
+              <div class="msg-text">
+                <span class="prefix">💡 김신성이라면 이렇게 대답했을 거예요 :)</span>
+                기한 경과 시 먼저 HRD-Net에서 상태 확인 후, 훈련기관에 사유서 제출을 요청드렸어요. 대부분 7일 이내 추가 접수 가능하니 빠르게 안내해드리세요!
+              </div>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="avatar av-u">👤</div>
+            <div>
+              <div class="msg-name">장재은 <span class="time">오전 9:03</span></div>
+              <div class="msg-text">사유서 양식은 어디서 받아요?</div>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="avatar av-b">🤖</div>
+            <div>
+              <div class="msg-name">바톤봇 <span class="time">오전 9:03</span></div>
+              <div class="msg-text">
+                <span class="prefix">💡 김신성이라면 이렇게 대답했을 거예요 :)</span>
+                HRD-Net 공지자료 게시판에 있어요. 없으면 고용센터 담당자에게 메일 요청하시면 바로 보내줘요!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-points">
+        <div class="demo-point">
+          <div class="dp-cmd">/바톤-학습</div>
+          <div class="dp-desc">슬랙 전체 채널 AI 학습<br>업무 노하우 자동 축적</div>
+        </div>
+        <div class="demo-point">
+          <div class="dp-cmd">/바톤-인계</div>
+          <div class="dp-desc">인수인계 후보 자동 분석<br>후임자에게 맞춤 전달</div>
+        </div>
+        <div class="demo-point">
+          <div class="dp-cmd">/바톤-시뮬레이션 5</div>
+          <div class="dp-desc">페르소나 봇 5명 즉시 등장<br>강성 민원 포함 실전 훈련</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── S5 · 시나리오 ─── -->
+  <div class="slide" id="s5">
+    <div class="slide-header">
+      <div class="tag">04 &nbsp; 실무 적용 시나리오</div>
+      <h1>누가, 언제, 어떻게 씁니까</h1>
+    </div>
+    <div class="scenario-grid">
+      <div class="sc-card">
+        <div class="sc-who">CASE 1 &nbsp;·&nbsp; 신입 온보딩</div>
+        <h3>첫 출근 당일부터</h3>
+        <div class="sc-flow">
+          <strong>장재은</strong>(신입)이 바톤봇 DM에 질문<br>
+          → <strong>김신성</strong> 스타일로 즉시 답변<br>
+          → 선배 눈치 없이 <strong>자립 온보딩</strong>
+        </div>
+        <div class="sc-result">✓ 온보딩 기간 3개월 → 1개월 목표</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-who">CASE 2 &nbsp;·&nbsp; 담당자 교체</div>
+        <h3>인수인계 당일 완료</h3>
+        <div class="sc-flow">
+          전임자가 <strong>/바톤-인계</strong> 실행<br>
+          → 핵심 업무·판단기준 자동 추출<br>
+          → 후임자에게 <strong>맞춤 인계서</strong> 즉시 전달
+        </div>
+        <div class="sc-result">✓ 퇴직 후 카카오톡 문의 Zero</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-who">CASE 3 &nbsp;·&nbsp; 실전 시뮬레이션</div>
+        <h3>혼자서 민원 대응 연습</h3>
+        <div class="sc-flow">
+          AI 페르소나 <strong>20명</strong>이 DM 발송<br>
+          → 강성 민원·반복 질문 포함<br>
+          → 실전과 동일한 <strong>대응 감각</strong> 체득
+        </div>
+        <div class="sc-result">✓ 실전 투입 전 리허설 가능</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-who">CASE 4 &nbsp;·&nbsp; 지식 자산화</div>
+        <h3>매주 자동으로 업데이트</h3>
+        <div class="sc-flow">
+          매주 월요일 <strong>자동 학습</strong> 스케줄러<br>
+          → 최신 채널 대화 반영<br>
+          → 조직의 <strong>살아있는 지식 DB</strong>
+        </div>
+        <div class="sc-result">✓ 담당자 바뀌어도 지식은 남는다</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── S6 · 확장 ─── -->
+  <div class="slide" id="s6">
+    <div class="slide-header">
+      <div class="tag">05 &nbsp; 확장 가능성</div>
+      <h1>팀 하나의 실험이<br>전사 표준이 됩니다</h1>
+    </div>
+    <div class="expand-row">
+      <div class="exp-card">
+        <span class="step-badge">STEP 1 · 지금</span>
+        <h3>1개 팀</h3>
+        <div class="exp-sub">파일럿 검증</div>
+        <ul>
+          <li>행정지원팀 실사용</li>
+          <li>전임자 1명 → 신입 1명</li>
+          <li>온보딩 기간·만족도 측정</li>
+        </ul>
+      </div>
+      <div class="exp-card">
+        <span class="step-badge">STEP 2 · 3개월 후</span>
+        <h3>본부 / 부문</h3>
+        <div class="exp-sub">수평 확산</div>
+        <ul>
+          <li>각 팀별 전용 바톤 운영</li>
+          <li>부서별 업무 스타일 보존</li>
+          <li>신입 온보딩 표준화</li>
+        </ul>
+      </div>
+      <div class="exp-card">
+        <span class="step-badge">STEP 3 · 1년 후</span>
+        <h3>전사 확산</h3>
+        <div class="exp-sub">조직 기억 플랫폼</div>
+        <ul>
+          <li>전사 업무 노하우 DB화</li>
+          <li>퇴직률 무관 지식 유지</li>
+          <li>법무·영업·개발팀 동일 적용</li>
+        </ul>
+      </div>
+    </div>
+    <div class="expand-bottom">
+      <div class="icon">💡</div>
+      <p><b>슬랙을 쓰는 모든 팀</b>에 즉시 적용 가능 &nbsp;·&nbsp; 도메인만 바꾸면 어떤 부서도 동일한 방식으로 운영됩니다</p>
+    </div>
+  </div>
+
+  <!-- ─── S7 · 마무리 ─── -->
+  <div class="slide" id="s7">
+    <div class="closing">
+      사람은 떠나도,<br>
+      <em>노하우는 남는다</em>
+    </div>
+    <div class="closing-sub">바톤은 조직의 기억을 지킵니다</div>
+    <div style="margin:28px 0 36px;background:rgba(233,69,96,0.12);border:1px solid rgba(233,69,96,0.4);border-radius:12px;padding:16px 36px;font-size:22px;font-weight:900;color:var(--red);letter-spacing:1px;">
+      "우린 3억을 버렸다."
+    </div>
+    <div style="font-size:13px;color:var(--red);font-weight:700;letter-spacing:2px;margin-bottom:12px;">TEAM B2GENIUS</div>
+    <div class="team-row">
+      <div class="member">김신성</div>
+      <div class="member">장재은</div>
+      <div class="member">김주하</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="slide-num"><b id="cur">1</b> / 7</div>
+<div class="nav">
+  <button onclick="move(-1)">← 이전</button>
+  <span class="counter" id="cnt">1 / 7</span>
+  <button onclick="move(1)">다음 →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  function move(dir) {
+    slides[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(slides.length - 1, cur + dir));
+    slides[cur].classList.add('active');
+    document.getElementById('cur').textContent = cur + 1;
+    document.getElementById('cnt').textContent = (cur+1) + ' / ' + slides.length;
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') move(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   move(-1);
+  });
+</script>
+</body>
+</html>
