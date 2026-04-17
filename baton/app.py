@@ -7,6 +7,7 @@ from baton.knowledge_store import KnowledgeStore
 from baton.claude_client import ClaudeClient
 from baton.learner import SlackLearner
 from baton.scheduler import LearningScheduler
+from baton.onboarding import OnboardingManager
 
 load_dotenv()
 
@@ -20,6 +21,7 @@ learner = SlackLearner(
     claude=claude,
     store=store
 )
+onboarding = OnboardingManager(slack_client=app.client, claude=claude, store=store)
 
 
 @app.event("message")
@@ -53,10 +55,30 @@ def trigger_learning(ack, say, logger):
 
 
 @app.command("/바톤-인계")
-def start_handover(ack, say):
-    """인계 프로세스 시작 (Task 7에서 구현)"""
+def start_handover(ack, say, command):
+    """인계 프로세스 시작"""
     ack()
-    say("🔄 인계 프로세스를 준비 중입니다...")
+    user_id = command["user_id"]
+    say(f"🔄 {PREDECESSOR_NAME}님의 인계 후보를 분석 중입니다...")
+    onboarding.start_handover(user_id, PREDECESSOR_NAME)
+    say("✅ DM으로 후보 목록을 보내드렸어요. 확인 후 `/바톤-인계-확정`을 사용해주세요.")
+
+
+@app.command("/바톤-인계-확정")
+def confirm_handover(ack, say, command):
+    """인계 확정. 사용법: /바톤-인계-확정 @인수자 1,2,3"""
+    ack()
+    text = command.get("text", "").strip()
+    parts = text.split()
+    if len(parts) < 2:
+        say("사용법: `/바톤-인계-확정 @인수자 1,2,3`")
+        return
+    successor_id = parts[0].strip("<@>").split("|")[0]
+    selected_ids = [int(x) for x in parts[1].split(",") if x.strip().isdigit()]
+    predecessor_id = command["user_id"]
+
+    onboarding.confirm_and_deliver(predecessor_id, successor_id, selected_ids, PREDECESSOR_NAME)
+    say(f"✅ <@{successor_id}>님께 온보딩 내용을 전달했습니다!")
 
 
 if __name__ == "__main__":
