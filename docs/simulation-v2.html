@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>바톤 — 실전 시뮬레이션</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
+
+    .header {
+      background: #4A154B;
+      color: white;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header h1 { font-size: 1rem; font-weight: 700; }
+    .header .subtitle { font-size: 0.78rem; opacity: 0.8; }
+    .badge { background: #E01E5A; border-radius: 20px; padding: 3px 10px; font-size: 0.75rem; font-weight: 600; }
+    .progress-wrap { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; }
+    .progress-bar-bg { width: 140px; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; }
+    .progress-bar-fill { height: 8px; background: #2BAC76; border-radius: 4px; transition: width 0.4s; }
+
+    .container { display: flex; height: calc(100vh - 58px); }
+
+    .sidebar {
+      width: 200px;
+      background: #3F0E40;
+      color: white;
+      overflow-y: auto;
+      flex-shrink: 0;
+      padding: 10px 0;
+    }
+    .sidebar-section { padding: 6px 12px 4px; font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.05em; }
+    .persona-item {
+      padding: 7px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      border-radius: 4px;
+      margin: 1px 4px;
+    }
+    .persona-item:hover { background: rgba(255,255,255,0.1); }
+    .persona-item.active { background: rgba(255,255,255,0.18); }
+    .persona-avatar { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
+    .normal-bg { background: #2BAC76; }
+    .difficult-bg { background: #E01E5A; }
+    .persona-name { font-weight: 500; }
+    .persona-badge { font-size: 0.6rem; opacity: 0.6; }
+    .done-mark { margin-left: auto; font-size: 0.75rem; }
+
+    .chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .chat-header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 11px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chat-header-avatar { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+    .chat-header-name { font-weight: 700; font-size: 0.92rem; }
+    .chat-header-trait { font-size: 0.75rem; color: #6b7280; }
+    .difficult-label { background: #FEE2E2; color: #DC2626; border-radius: 4px; padding: 2px 7px; font-size: 0.68rem; font-weight: 700; margin-left: 6px; }
+
+    .messages { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; background: white; }
+    .message { display: flex; gap: 10px; align-items: flex-start; }
+    .message.mine { flex-direction: row-reverse; }
+    .msg-avatar { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700; flex-shrink: 0; }
+    .msg-content { max-width: 68%; }
+    .msg-name { font-size: 0.72rem; font-weight: 700; color: #374151; margin-bottom: 3px; }
+    .message.mine .msg-name { text-align: right; }
+    .msg-bubble { padding: 9px 13px; border-radius: 12px; font-size: 0.88rem; line-height: 1.55; background: #f3f4f6; color: #111827; }
+    .message.mine .msg-bubble { background: #4A154B; color: white; }
+    .msg-time { font-size: 0.68rem; color: #9ca3af; margin-top: 3px; }
+    .message.mine .msg-time { text-align: right; }
+
+    .typing { display: none; align-items: center; gap: 6px; color: #9ca3af; font-size: 0.8rem; padding: 4px 0; }
+    .typing.show { display: flex; }
+    .dot { width: 5px; height: 5px; background: #9ca3af; border-radius: 50%; animation: bounce 1.2s infinite; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+    .score-bar { background: #f9fafb; border-top: 1px solid #e5e7eb; padding: 8px 18px; display: flex; gap: 16px; font-size: 0.78rem; color: #6b7280; }
+    .score-bar span { font-weight: 700; color: #111827; }
+
+    .input-area { background: white; border-top: 1px solid #e5e7eb; padding: 12px 18px; display: flex; gap: 8px; align-items: flex-end; }
+    .input-area textarea { flex: 1; border: 1px solid #d1d5db; border-radius: 8px; padding: 9px 12px; font-size: 0.88rem; font-family: inherit; resize: none; outline: none; max-height: 110px; min-height: 40px; }
+    .input-area textarea:focus { border-color: #4A154B; }
+    .send-btn { background: #4A154B; color: white; border: none; border-radius: 8px; padding: 9px 16px; font-size: 0.88rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .send-btn:hover { background: #611f69; }
+    .next-btn { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 8px; padding: 9px 14px; font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .next-btn:hover { background: #e5e7eb; }
+
+    .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9ca3af; gap: 10px; }
+    .empty-state .icon { font-size: 2.8rem; }
+    .start-btn { background: #4A154B; color: white; border: none; border-radius: 8px; padding: 12px 28px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px; }
+    .start-btn:hover { background: #611f69; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <h1>바톤 — 실전 시뮬레이션</h1>
+      <div class="badge">3단계</div>
+    </div>
+    <div class="subtitle">가상 훈련생 20명의 DM에 실제처럼 응답해보세요</div>
+  </div>
+  <div class="progress-wrap" id="progress-wrap" style="display:none">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-fill" style="width:0%"></div></div>
+    <span id="prog-text" style="color:white;font-size:0.8rem">0/20</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-section">훈련생 목록</div>
+    <div id="persona-list"></div>
+  </div>
+  <div class="chat-area" id="chat-area">
+    <div class="empty-state" id="empty-state">
+      <div class="icon">🎭</div>
+      <p style="font-size:1rem;font-weight:600;color:#374151">실전 시뮬레이션</p>
+      <p style="font-size:0.85rem">훈련생 20명 (강성 5명 포함)</p>
+      <button class="start-btn" onclick="startSimulation()">시뮬레이션 시작</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PERSONAS = [
+  // 강성 5명
+  { id:1,  name:"김급함", type:"difficult", emoji:"😤", trait:"모든 것이 급하고 즉각 답변을 요구함",
+    question:"지금 당장 훈련장려금 처리해줘야 해요!! 오늘 마감인데 왜 아직도 안 됐죠?? 빨리요!!" },
+  { id:2,  name:"최불만", type:"difficult", emoji:"😠", trait:"기존 방식에 불만이 많고 반박을 잘 함",
+    question:"솔직히 이 절차 너무 비효율적이지 않나요? 왜 이렇게 복잡하게 만들어놨는지 이해가 안 가요. 다른 데는 이렇게 안 하던데요." },
+  { id:3,  name:"정복잡", type:"difficult", emoji:"🤯", trait:"질문이 매우 길고 여러 내용을 한번에 물어봄",
+    question:"안녕하세요, 궁금한 게 좀 많아서요. 첫째로 비용신청 기한이 언제인지, 둘째로 영수증 없을 때는 어떻게 하는지, 셋째로 법인카드랑 개인카드 처리 방식이 다른지, 넷째로 해외 출장비는 별도인지, 다섯째로 부서장 승인이 꼭 필요한지 다 알려주실 수 있나요?" },
+  { id:4,  name:"한예외", type:"difficult", emoji:"🙄", trait:"항상 예외 케이스를 가져오며 원칙에 맞지 않는 요청을 함",
+    question:"제 상황이 좀 특수해서요. 원래 규정상 안 되는 건 아는데, 저는 예외 적용이 가능하지 않을까요? 위에서도 괜찮다고 한 것 같던데..." },
+  { id:5,  name:"오반복", type:"difficult", emoji:"😅", trait:"같은 질문을 여러 번 반복하며 확인을 과도하게 요구함",
+    question:"아까 출결 정정 신청한다고 했잖아요. 그거 접수 됐나요? 확인이 안 돼서요. 다시 한번 확인해주실 수 있어요? 진짜 됐는지 걱정돼서요." },
+  // 일반 15명
+  { id:6,  name:"박신입", type:"normal", emoji:"🙂", trait:"열정적이고 질문이 많은 신입",
+    question:"안녕하세요! 저 오늘 첫 출근인데요, 비용신청은 어떻게 하면 되나요? 처음이라 아무것도 몰라서요 😊" },
+  { id:7,  name:"이조용", type:"normal", emoji:"😶", trait:"말수가 적고 혼자 해결하려는 성격",
+    question:"출결 정정 신청 양식 어디 있나요" },
+  { id:8,  name:"강열심", type:"normal", emoji:"💪", trait:"업무에 성실하며 프로세스를 잘 따름",
+    question:"훈련비 청구 절차 처음부터 끝까지 정리된 문서 있으면 보내주실 수 있나요? 제대로 알고 싶어서요." },
+  { id:9,  name:"윤전직", type:"normal", emoji:"🧑‍💼", trait:"다른 부서에서 이동해온 경험자",
+    question:"이전 부서에서는 비용처리를 다르게 했는데, 여기 방식으로 새로 배워야 할 것 같아서요. 달라진 부분 위주로 설명해주실 수 있나요?" },
+  { id:10, name:"장적응", type:"normal", emoji:"🌱", trait:"새로운 업무에 적응 중인 재직자",
+    question:"담당 업무가 바뀐 지 얼마 안 됐는데, 훈련생 출결 관리는 어떤 시스템으로 하나요?" },
+  { id:11, name:"홍확인", type:"normal", emoji:"🔍", trait:"꼼꼼하게 확인하는 성격",
+    question:"지난주에 제출한 비용신청서 처리 현황 확인할 수 있나요? 승인됐는지 아닌지 알고 싶어서요." },
+  { id:12, name:"임궁금", type:"normal", emoji:"🤔", trait:"호기심이 많고 배우려는 의지가 강함",
+    question:"훈련장려금이랑 훈련비가 다른 건가요? 둘 다 신청해야 하는 건지 헷갈려서요." },
+  { id:13, name:"조계획", type:"normal", emoji:"📋", trait:"계획적으로 일하는 스타일",
+    question:"이번 달 비용 마감일이 언제예요? 미리 일정 잡아두려고요." },
+  { id:14, name:"신친절", type:"normal", emoji:"😊", trait:"매너 있고 정중한 태도",
+    question:"바쁘신 와중에 죄송한데요, 출결부 제출 기한이 언제까지인지 여쭤봐도 될까요? 감사합니다!" },
+  { id:15, name:"양혼란", type:"normal", emoji:"😵", trait:"업무 파악이 덜 돼 혼란스러운 상태",
+    question:"저 뭘 어떻게 해야 할지 모르겠어요. 입과 서류 여러 개 받았는데 어디서부터 시작해야 하죠?" },
+  { id:16, name:"권신중", type:"normal", emoji:"🎯", trait:"신중하게 확인 후 행동하는 스타일",
+    question:"비용신청서 제출 전에 꼭 확인해야 할 사항들이 있나요? 실수하면 다시 해야 할 것 같아서 미리 여쭤봐요." },
+  { id:17, name:"문배움", type:"normal", emoji:"📚", trait:"처음이라 모르는 게 많은 신입",
+    question:"NCS 훈련이 뭔지는 아는데, 관련 서류 관리는 제가 직접 해야 하나요 아니면 자동으로 되나요?" },
+  { id:18, name:"류성실", type:"normal", emoji:"🏃", trait:"성실하게 따라가는 스타일",
+    question:"훈련생 명단 업데이트는 언제 하면 되나요? 주기가 정해져 있나요?" },
+  { id:19, name:"고준비", type:"normal", emoji:"⚡", trait:"미리미리 준비하는 스타일",
+    question:"다음 달 과정 개강 준비로 미리 해둬야 할 행정 체크리스트 있으면 공유해주실 수 있어요?" },
+  { id:20, name:"나마무", type:"normal", emoji:"😑", trait:"무관심하고 최소한만 하려는 스타일",
+    question:"서류 꼭 다 내야 해요? 필수만 알려주세요." },
+];
+
+let responded = {};
+let simulationStarted = false;
+
+function startSimulation() {
+  simulationStarted = true;
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('progress-wrap').style.display = 'flex';
+  renderSidebar();
+  loadChat(0);
+}
+
+function renderSidebar() {
+  const difficult = PERSONAS.filter(p => p.type === 'difficult');
+  const normal = PERSONAS.filter(p => p.type === 'normal');
+  const makeItem = (p, i) => `
+    <div class="persona-item ${currentIdx === i ? 'active' : ''}" onclick="loadChat(${i})" id="pi-${i}">
+      <div class="persona-avatar ${p.type === 'difficult' ? 'difficult-bg' : 'normal-bg'}">${p.emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div class="persona-name">${p.name}</div>
+        <div class="persona-badge">${p.type === 'difficult' ? '⚠️ 강성' : '일반'}</div>
+      </div>
+      ${responded[p.id] ? '<div class="done-mark">✅</div>' : ''}
+    </div>`;
+  document.getElementById('persona-list').innerHTML =
+    '<div class="sidebar-section" style="color:#ff8a8a">⚠️ 강성 훈련생</div>' +
+    difficult.map((p) => makeItem(p, PERSONAS.indexOf(p))).join('') +
+    '<div class="sidebar-section" style="margin-top:8px">일반 훈련생</div>' +
+    normal.map((p) => makeItem(p, PERSONAS.indexOf(p))).join('');
+  updateProgress();
+}
+
+let currentIdx = 0;
+
+function loadChat(idx) {
+  currentIdx = idx;
+  const p = PERSONAS[idx];
+  renderSidebar();
+  const chatArea = document.getElementById('chat-area');
+  chatArea.innerHTML = `
+    <div class="chat-header">
+      <div class="chat-header-avatar ${p.type === 'difficult' ? 'difficult-bg' : 'normal-bg'}" style="color:white">${p.emoji}</div>
+      <div>
+        <div style="display:flex;align-items:center">
+          <div class="chat-header-name">${p.name}</div>
+          ${p.type === 'difficult' ? '<span class="difficult-label">강성</span>' : ''}
+        </div>
+        <div class="chat-header-trait">${p.trait}</div>
+      </div>
+      <div style="margin-left:auto;font-size:0.78rem;color:#9ca3af">${idx+1} / 20</div>
+    </div>
+    <div class="messages" id="msgs">
+      <div class="message">
+        <div class="msg-avatar" style="background:${p.type==='difficult'?'#E01E5A':'#2BAC76'};color:white">${p.emoji}</div>
+        <div class="msg-content">
+          <div class="msg-name">${p.name}</div>
+          <div class="msg-bubble">${p.question}</div>
+          <div class="msg-time">${getTime()}</div>
+        </div>
+      </div>
+      <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>입력 중...</span></div>
+    </div>
+    <div class="score-bar">
+      <div>응답 완료: <span>${Object.keys(responded).length}/20명</span></div>
+      <div>현재: <span>${p.name}</span> (${p.type==='difficult'?'⚠️ 강성':'일반'})</div>
+    </div>
+    <div class="input-area">
+      <textarea id="inp" placeholder="${p.name}에게 답변하세요... (Enter: 전송, Shift+Enter: 줄바꿈)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendReply()}"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <button class="next-btn" onclick="skip()">건너뛰기</button>
+      <button class="send-btn" onclick="sendReply()">전송 ↵</button>
+    </div>`;
+  document.getElementById('inp').focus();
+}
+
+function sendReply() {
+  const inp = document.getElementById('inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  const msgs = document.getElementById('msgs');
+  const typing = document.getElementById('typing');
+  const myMsg = document.createElement('div');
+  myMsg.className = 'message mine';
+  myMsg.innerHTML = `
+    <div class="msg-avatar" style="background:#4A154B;color:white;font-size:0.75rem">나</div>
+    <div class="msg-content">
+      <div class="msg-name">나</div>
+      <div class="msg-bubble">${text}</div>
+      <div class="msg-time">${getTime()}</div>
+    </div>`;
+  msgs.insertBefore(myMsg, typing);
+  inp.value = ''; inp.style.height = 'auto';
+  msgs.scrollTop = msgs.scrollHeight;
+  responded[PERSONAS[currentIdx].id] = true;
+  updateProgress();
+  renderSidebar();
+  const next = currentIdx + 1;
+  if (next < PERSONAS.length) {
+    document.querySelector('.score-bar').innerHTML = `<div>✅ 답변 완료! 잠시 후 다음 훈련생으로 이동합니다...</div>`;
+    setTimeout(() => loadChat(next), 1800);
+  } else { setTimeout(showComplete, 500); }
+}
+
+function skip() {
+  const next = currentIdx + 1;
+  if (next < PERSONAS.length) loadChat(next); else showComplete();
+}
+
+function showComplete() {
+  document.getElementById('chat-area').innerHTML = `
+    <div class="empty-state">
+      <div class="icon">🎉</div>
+      <p style="font-size:1.1rem;font-weight:700;color:#111827">시뮬레이션 완료!</p>
+      <p>${Object.keys(responded).length}/20명 응답 완료</p>
+      <p style="color:#6b7280;font-size:0.82rem;margin-top:6px">수고하셨습니다!</p>
+      <button class="start-btn" onclick="resetAll()" style="margin-top:14px">다시 시작</button>
+    </div>`;
+}
+
+function resetAll() {
+  responded = {}; currentIdx = 0;
+  renderSidebar(); loadChat(0);
+}
+
+function updateProgress() {
+  const done = Object.keys(responded).length;
+  document.getElementById('prog-fill').style.width = (done/20*100) + '%';
+  document.getElementById('prog-text').textContent = `${done}/20`;
+}
+
+function getTime() {
+  return new Date().toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+}
+</script>
+</body>
+</html>
